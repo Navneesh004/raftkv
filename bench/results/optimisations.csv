@@ -1,0 +1,4 @@
+config,max_entries_per_rpc,group_commit,ops_per_sec,p50_ms,p99_ms
+baseline,1,false,17.4,3335.306,4835.144
++ batching,0,false,96.4,517.430,3155.158
++ group commit,0,true,1279.5,36.128,829.951

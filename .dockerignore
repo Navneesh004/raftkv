@@ -1,0 +1,4 @@
+.git
+bench/results
+**/data
+*.html

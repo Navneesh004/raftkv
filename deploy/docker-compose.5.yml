@@ -1,0 +1,57 @@
+# A 5-replica raftkv cluster (tolerates 2 simultaneous failures).
+#
+#   docker compose -f deploy/docker-compose.5.yml up -d --build
+#   COMPOSE_FILE=deploy/docker-compose.5.yml ./deploy/chaos.sh 600
+
+name: raftkv
+
+x-node: &node
+  build:
+    context: ..
+  image: raftkv:latest
+  restart: "no"
+
+x-peers: &peers "node0:7000,node1:7000,node2:7000,node3:7000,node4:7000"
+
+services:
+  node0:
+    <<: *node
+    command: ["-id", "0", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node0:/data"]
+    ports: ["18080:8080"]
+  node1:
+    <<: *node
+    command: ["-id", "1", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node1:/data"]
+    ports: ["18081:8080"]
+  node2:
+    <<: *node
+    command: ["-id", "2", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node2:/data"]
+    ports: ["18082:8080"]
+  node3:
+    <<: *node
+    command: ["-id", "3", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node3:/data"]
+    ports: ["18083:8080"]
+  node4:
+    <<: *node
+    command: ["-id", "4", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node4:/data"]
+    ports: ["18084:8080"]
+
+  cli:
+    image: raftkv:latest
+    profiles: ["tools"]
+    entrypoint: ["raftkv-cli", "-servers", *peers]
+  loadgen:
+    image: raftkv:latest
+    profiles: ["tools"]
+    entrypoint: ["raftkv-loadgen", "-servers", *peers]
+
+volumes:
+  node0:
+  node1:
+  node2:
+  node3:
+  node4:

@@ -1,0 +1,9 @@
+# binaries
+/raftkv-*
+*.exe
+*.test
+*.out
+
+# local runtime state
+data/
+history.html

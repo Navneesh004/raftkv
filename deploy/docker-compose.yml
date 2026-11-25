@@ -1,0 +1,52 @@
+# A 3-replica raftkv cluster. From the repository root:
+#
+#   docker compose -f deploy/docker-compose.yml up -d --build
+#   docker compose -f deploy/docker-compose.yml logs -f node0 node1 node2
+#   docker compose -f deploy/docker-compose.yml run --rm cli status
+#   ./deploy/chaos.sh 3600
+#
+# Each replica keeps its Raft state in a named volume, so `docker kill`
+# followed by `docker start` is a genuine crash-and-recover.
+
+name: raftkv
+
+x-node: &node
+  build:
+    context: ..
+  image: raftkv:latest
+  restart: "no"
+  stop_signal: SIGTERM
+
+x-peers: &peers "node0:7000,node1:7000,node2:7000"
+
+services:
+  node0:
+    <<: *node
+    command: ["-id", "0", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node0:/data"]
+    ports: ["18080:8080"]
+  node1:
+    <<: *node
+    command: ["-id", "1", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node1:/data"]
+    ports: ["18081:8080"]
+  node2:
+    <<: *node
+    command: ["-id", "2", "-peers", *peers, "-data", "/data", "-http", ":8080"]
+    volumes: ["node2:/data"]
+    ports: ["18082:8080"]
+
+  # Tools; run on demand with `docker compose run --rm <name> ...`.
+  cli:
+    image: raftkv:latest
+    profiles: ["tools"]
+    entrypoint: ["raftkv-cli", "-servers", *peers]
+  loadgen:
+    image: raftkv:latest
+    profiles: ["tools"]
+    entrypoint: ["raftkv-loadgen", "-servers", *peers]
+
+volumes:
+  node0:
+  node1:
+  node2:
