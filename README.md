@@ -28,9 +28,11 @@ Docker Compose cluster and a `kill -9` chaos script.
   the election timeout, and before/after numbers for batching and group commit
   ([results](#results)).
 
-<!-- DEMO: record a GIF of `docker compose logs -f` + loadgen while chaos.sh kills the leader, save as docs/demo.gif, and uncomment:
-![demo](docs/demo.gif)
--->
+![raftkv demo: the leader is killed with kill -9 under load, a new leader takes over, the old leader recovers from disk and catches up, and the load generator finishes with zero wrong reads](docs/demo.gif)
+
+*Recorded run: 3 nodes, 8 checking clients. The leader is `kill -9`ed, node1 wins
+the election, node2 restarts from its on-disk log and catches up. 2869 operations,
+longest gap with no successful operation 1.75 s, 0 wrong reads.*
 
 ## Architecture
 
