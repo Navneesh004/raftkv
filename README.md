@@ -3,8 +3,8 @@
 [![ci](https://github.com/Navneesh004/raftkv/actions/workflows/ci.yml/badge.svg)](https://github.com/Navneesh004/raftkv/actions/workflows/ci.yml)
 
 A fault-tolerant, **linearizable key-value store** built on my own from-scratch
-implementation of the **Raft consensus algorithm** in Go. No Raft or RPC
-framework is used. The repo includes a fault-injecting simulated network, a
+implementation of the **Raft consensus algorithm** in Go. No Raft
+library is used. The repo includes a fault-injecting simulated network, a
 Porcupine linearizability checker, crash-safe on-disk persistence, a
 Docker Compose cluster and a `kill -9` chaos script.
 
@@ -16,7 +16,7 @@ Docker Compose cluster and a `kill -9` chaos script.
 - **Exactly-once client semantics:** client IDs plus sequence numbers make a
   retried `Append` apply once, even across crashes, because the duplicate table
   is part of the snapshot.
-- **Verified, not just tested:** every randomized chaos test records the full
+- **Checked, not just tested:** every randomized chaos test records the full
   client history and checks it for **linearizability with
   [Porcupine](https://github.com/anishathalye/porcupine)**. Every test runs
   under Go's race detector.
@@ -177,7 +177,7 @@ random replica `kill -9`ed every few seconds and restarted from its volume.
 > longest stretch with no successful operation was 1.9 s, and snapshots kept
 > each replica's log under about 160 entries.
 
-To run it for an hour, the way the project plan specifies, use
+To run it for an hour, use
 `./deploy/chaos.sh 3600 8`.
 
 ### Throughput and latency: 3 vs 5 replicas
